@@ -1,7 +1,6 @@
 package me.bsu.moovgroovfinal.models;
 
 import android.database.Cursor;
-import android.util.Log;
 
 import com.activeandroid.Cache;
 import com.activeandroid.Model;
@@ -41,15 +40,8 @@ public class Track extends Model {
         String resultRecords = new Select(tableName + ".*, " + tableName + ".Id as _id")
                 .from(Track.class)
                 .where("project = " + projectID)
-//                .orderBy("name ASC")
-                .toSql();
-        Log.d(TAG, resultRecords);
-        List<Track> t = new Select(tableName + ".*, " + tableName + ".Id as _id")
-                .from(Track.class)
-                .where("project = ?", projectID)
                 .orderBy("name ASC")
-                .execute();
-        Log.d(TAG, t.size() + " returned");
+                .toSql();
         // Execute query on the underlying ActiveAndroid SQLite database
         Cursor resultCursor = Cache.openDatabase().rawQuery(resultRecords, null);
         return resultCursor;

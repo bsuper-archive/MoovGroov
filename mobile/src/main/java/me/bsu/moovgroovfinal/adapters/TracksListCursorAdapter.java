@@ -3,7 +3,6 @@ package me.bsu.moovgroovfinal.adapters;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,18 +31,11 @@ public class TracksListCursorAdapter extends CursorRecyclerAdapter<TracksListCur
         super(cursor);
         this.cursor = cursor;
         this.context = context;
-        cursor.moveToFirst();
-        for (String columnName : cursor.getColumnNames()) {
-            Log.d(TAG, "Column Name: " + columnName);
-            Log.d(TAG, "Index: " + cursor.getColumnIndexOrThrow(columnName));
-        }
-        Log.d(TAG, cursor.getCount() + " items");
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, Cursor cursor) {
         holder.name.setText(cursor.getString(cursor.getColumnIndexOrThrow("name")));
-        Log.d(TAG, cursor.getString(cursor.getColumnIndexOrThrow("name")));
     }
 
     @Override

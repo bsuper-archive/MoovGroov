@@ -36,9 +36,8 @@ public class TracksActivity extends AppCompatActivity {
 
         projectID = getIntent().getLongExtra(INTENT_PROJECT_ID, 0);
         Log.d(TAG, String.format("Got project ID %d", projectID));
-
+        
         setupRecyclerView();
-        populateTracksIfNecessary();
         populateTracksIfNecessary();
         populateRecyclerView();
     }
@@ -65,28 +64,22 @@ public class TracksActivity extends AppCompatActivity {
     private void populateRecyclerView() {
         mAdapter = new TracksListCursorAdapter(Track.getTracksCursor(projectID), this);
         mRecyclerView.swapAdapter(mAdapter, true);
-
-        for (Track t : Track.getTracks(projectID)) {
-            Log.d(TAG, "Track " + t.name + " " + t.filename + " " + t.project.getId());
-        }
     }
 
     private void populateTracksIfNecessary() {
-//        ActiveAndroid.getDatabase().execSQL("DROP TABLE IF EXISTS tracks");
         if (Track.getTracks(projectID).size() < 5) {
             Project p = new Select().from(Project.class).where("Id = ?", projectID).executeSingle();
             Log.d(TAG, "Got Project Name: " + p.name);
 
-            String name = "kick ass track";
+            String name = p.name + " kick ass";
             String filename = "bogus file name";
             Track t = new Track(name, filename, p);
             t.save();
 
-            String name2 = "momo";
+            String name2 = p.name + " momo";
             String filename2 = "haha";
             Track t2 = new Track(name2, filename2, p);
             t2.save();
-            populateRecyclerView();
         } else {
             Log.d(TAG, Track.getTracks(projectID).size() + " items for project");
         }
