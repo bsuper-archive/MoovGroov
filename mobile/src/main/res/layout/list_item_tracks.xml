@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="72dp"
+              android:background="#333333"
+              android:weightSum="1">
+
+    <TextView
+        android:id="@+id/list_item_name"
+        android:layout_width="0dp"
+        android:layout_weight=".8"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:layout_marginLeft="40dp"
+        android:textSize="30dp"
+        android:text="Vocal Melody 1"
+        android:textStyle="bold"
+        android:textColor="#ffffff" />
+
+    <ImageButton
+        android:id="@+id/list_item_play_pause"
+        android:layout_width="0dp"
+        android:layout_weight=".2"
+        android:layout_height="match_parent"
+        android:layout_marginRight="16dp"
+        android:background="#333333"
+        android:src="@drawable/ic_play_arrow_white_48dp"/>
+
+
+</LinearLayout>

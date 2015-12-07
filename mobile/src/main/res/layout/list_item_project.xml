@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="108dp"
+    android:clickable="true"
+    android:background="#333333"
+    android:weightSum="1">
+
+    <TextView
+        android:id="@+id/list_item_name"
+        android:layout_width="0dp"
+        android:layout_weight=".7"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:layout_marginLeft="40dp"
+        android:textSize="30dp"
+        android:text="Project1"
+        android:textStyle="bold"
+        android:textColor="#ffffff" />
+
+    <TextView
+        android:id="@+id/list_item_last_modified"
+        android:layout_width="0dp"
+        android:layout_weight=".3"
+        android:layout_height="match_parent"
+        android:layout_marginRight="16dp"
+        android:gravity="center"
+        android:textSize="17dp"
+        android:text="12/05/15 8:15pm"
+        android:textColor="#0ABAB5"/>
+
+</LinearLayout>
+
