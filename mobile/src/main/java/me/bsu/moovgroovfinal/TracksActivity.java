@@ -104,6 +104,7 @@ public class TracksActivity extends AppCompatActivity {
 
     private void startAddVocalTrackActivity() {
         Intent i = new Intent(TracksActivity.this, RecordActivity.class);
+        i.putExtra(INTENT_PROJECT_ID, projectID);
         startActivity(i);
     }
 

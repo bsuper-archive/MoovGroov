@@ -19,7 +19,7 @@
             android:value="MoovGroov.db" />
         <meta-data
             android:name="AA_DB_VERSION"
-            android:value="11" />
+            android:value="12" />
 
         <activity
             android:name=".ProjectsActivity"
