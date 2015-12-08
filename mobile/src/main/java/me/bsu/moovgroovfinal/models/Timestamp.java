@@ -14,8 +14,7 @@ public class Timestamp extends Model implements Comparable<Timestamp> {
     public Track track;
 
     public Timestamp() {
-        this.track = new Track();
-        this.time = 0;
+        super();
     }
 
     public Timestamp(Track track, long time) {

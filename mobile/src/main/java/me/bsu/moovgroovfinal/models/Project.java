@@ -59,5 +59,9 @@ public class Project extends Model {
                 .execute();
     }
 
+    public static Project getProject(long projectID) {
+        return new Select().from(Project.class).where("Id = ?", projectID).executeSingle();
+    }
+
 
 }

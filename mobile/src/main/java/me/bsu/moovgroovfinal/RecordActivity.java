@@ -1,37 +1,42 @@
 package me.bsu.moovgroovfinal;
 
 import android.app.Activity;
-        import android.support.annotation.NonNull;
-        import android.text.InputType;
-        import android.widget.LinearLayout;
-        import android.os.Bundle;
-        import android.os.Environment;
-        import android.view.ViewGroup;
-        import android.widget.Button;
-        import android.view.View;
-        import android.view.View.OnClickListener;
-        import android.content.Context;
-        import android.util.Log;
-        import android.media.MediaRecorder;
-        import android.media.MediaPlayer;
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
+import android.os.Bundle;
+import android.os.Environment;
+import android.support.annotation.NonNull;
+import android.text.InputType;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
-        import com.afollestad.materialdialogs.DialogAction;
-        import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 
-        import java.io.File;
-        import java.io.IOException;
+import java.io.File;
+import java.io.IOException;
+
+import me.bsu.moovgroovfinal.models.Project;
+import me.bsu.moovgroovfinal.models.Track;
 
 // http://developer.android.com/guide/topics/media/audio-capture.html
-public class RecordActivity extends Activity
-{
-    private static final String LOG_TAG = "RecordActivity";
-    private static String mFileName = null;
+public class RecordActivity extends Activity {
+    private static final String TAG = "RecordActivity";
+    private static String tempFilename = Environment.getExternalStorageDirectory().getAbsolutePath() + "/temp.mp4";
+    private String mFilePath = "";
 
-    private RecordButton mRecordButton = null;
+    private Button mRecordButton = null;
     private MediaRecorder mRecorder = null;
 
-    private PlayButton   mPlayButton = null;
+    private Button   mPlayButton = null;
     private MediaPlayer   mPlayer = null;
+
+    boolean mStartRecording = true;
+    boolean mStartPlaying = true;
+
+    private long projectID;
+
 
     private void onRecord(boolean start) {
         if (start) {
@@ -51,38 +56,17 @@ public class RecordActivity extends Activity
 
     private void startPlaying() {
         mPlayer = new MediaPlayer();
-
-        // Pop up Dialog to get save filename
-        new MaterialDialog.Builder(RecordActivity.this)
-                .title("Play Sound Recording")
-                .inputType(InputType.TYPE_CLASS_TEXT)
-                .input("Sound Filename", "", new MaterialDialog.InputCallback() {
-                    @Override
-                    public void onInput(MaterialDialog dialog, CharSequence input) {
-                        // Do something
-                    }
-                })
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        String fileName = dialog.getInputEditText().getText().toString();
-                        Log.d("RECORD", "EDITEXT: %s".format(dialog.getInputEditText().getText().toString()));
-                        String newFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
-                        newFileName += "/" + fileName + ".mp4";
-
-                        try {
-                            mPlayer.setDataSource(newFileName);
-                            mPlayer.prepare();
-                            mPlayer.start();
-                        } catch (IOException e) {
-                            Log.e(LOG_TAG, "prepare() failed");
-                        }
-                    }
-                }).show();
-
-
-
-
+        if (!mFilePath.equals("")) {
+            try {
+                mPlayer.setDataSource(mFilePath);
+                mPlayer.prepare();
+                mPlayer.start();
+            } catch (IOException e) {
+                Log.d(TAG, "Cannot get file");
+            }
+        } else {
+            Log.d(TAG, "No file created yet");
+        }
     }
 
     private void stopPlaying() {
@@ -94,13 +78,13 @@ public class RecordActivity extends Activity
         mRecorder = new MediaRecorder();
         mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        mRecorder.setOutputFile(mFileName);
+        mRecorder.setOutputFile(tempFilename);
         mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
         try {
             mRecorder.prepare();
         } catch (IOException e) {
-            Log.e(LOG_TAG, "prepare() failed");
+            Log.e(TAG, "prepare() failed");
         }
 
         mRecorder.start();
@@ -110,7 +94,10 @@ public class RecordActivity extends Activity
         mRecorder.stop();
         mRecorder.release();
         mRecorder = null;
+        saveTempFile();
+    }
 
+    private void saveTempFile() {
         // Pop up Dialog to get save filename
         new MaterialDialog.Builder(RecordActivity.this)
                 .title("Save Sound Recording")
@@ -126,65 +113,45 @@ public class RecordActivity extends Activity
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         String fileName = dialog.getInputEditText().getText().toString();
                         Log.d("RECORD", "EDITEXT: %s".format(dialog.getInputEditText().getText().toString()));
-                        String newFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
-                        newFileName += "/" + fileName + ".mp4";
-                        File file = new File(mFileName);
-                        File file2 = new File(newFileName);
+                        mFilePath = Environment.getExternalStorageDirectory().getAbsolutePath();
+                        mFilePath += "/" + fileName + ".mp4";
+                        File file = new File(tempFilename);
+                        File file2 = new File(mFilePath);
                         boolean success = file.renameTo(file2);
+
+                        Track t = new Track("Vocal Recording", mFilePath, Track.TYPE_VOCAL, Project.getProject(projectID));
+                        t.save();
                     }
                 }).show();
-
-
     }
 
-    class RecordButton extends Button {
-        boolean mStartRecording = true;
-
-        OnClickListener clicker = new OnClickListener() {
+    private void setupButtons() {
+        mRecordButton = (Button) findViewById(R.id.record_button);
+        mPlayButton = (Button) findViewById(R.id.play_button);
+        mRecordButton.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 onRecord(mStartRecording);
                 if (mStartRecording) {
-                    setText("Stop recording");
+                    mRecordButton.setText("Stop recording");
                 } else {
-                    setText("Start recording");
+                    mRecordButton.setText("Start recording");
                 }
                 mStartRecording = !mStartRecording;
             }
-        };
-
-        public RecordButton(Context ctx) {
-            super(ctx);
-            setText("Start recording");
-            setOnClickListener(clicker);
-        }
-    }
-
-    class PlayButton extends Button {
-        boolean mStartPlaying = true;
-
-        OnClickListener clicker = new OnClickListener() {
+        });
+        mPlayButton.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 onPlay(mStartPlaying);
                 if (mStartPlaying) {
-                    setText("Stop playing");
+                    mPlayButton.setText("Stop playing");
                 } else {
-                    setText("Start playing");
+                    mPlayButton.setText("Start playing");
                 }
                 mStartPlaying = !mStartPlaying;
             }
-        };
-
-        public PlayButton(Context ctx) {
-            super(ctx);
-            setText("Start playing");
-            setOnClickListener(clicker);
-        }
-    }
-
-    public RecordActivity() {
-        mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
-        mFileName += "/audiorecordtest.mp4";
-        Log.d("RecordActivity", "Filepath: "+mFileName);
+        });
     }
 
     @Override
@@ -192,20 +159,9 @@ public class RecordActivity extends Activity
         super.onCreate(icicle);
         setContentView(R.layout.activity_record);
 
-        LinearLayout ll = new LinearLayout(this);
-        mRecordButton = new RecordButton(this);
-        ll.addView(mRecordButton,
-                new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        0));
-        mPlayButton = new PlayButton(this);
-        ll.addView(mPlayButton,
-                new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        0));
-        setContentView(ll);
+        projectID = getIntent().getLongExtra(TracksActivity.INTENT_PROJECT_ID, 0);
+
+        setupButtons();
     }
 
     @Override
@@ -222,4 +178,54 @@ public class RecordActivity extends Activity
         }
     }
 }
+
+//    public RecordActivity() {
+//        mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
+//        mFileName += "/audiorecordtest.mp4";
+//        Log.d("RecordActivity", "Filepath: "+mFileName);
+//    }
+
+//    class RecordButton extends Button {
+//        boolean mStartRecording = true;
+//
+//        OnClickListener clicker = new OnClickListener() {
+//            public void onClick(View v) {
+//                onRecord(mStartRecording);
+//                if (mStartRecording) {
+//                    setText("Stop recording");
+//                } else {
+//                    setText("Start recording");
+//                }
+//                mStartRecording = !mStartRecording;
+//            }
+//        };
+//
+//        public RecordButton(Context ctx) {
+//            super(ctx);
+//            setText("Start recording");
+//            setOnClickListener(clicker);
+//        }
+//    }
+//
+//    class PlayButton extends Button {
+//        boolean mStartPlaying = true;
+//
+//        OnClickListener clicker = new OnClickListener() {
+//            public void onClick(View v) {
+//                onPlay(mStartPlaying);
+//                if (mStartPlaying) {
+//                    setText("Stop playing");
+//                } else {
+//                    setText("Start playing");
+//                }
+//                mStartPlaying = !mStartPlaying;
+//            }
+//        };
+//
+//        public PlayButton(Context ctx) {
+//            super(ctx);
+//            setText("Start playing");
+//            setOnClickListener(clicker);
+//        }
+//    }
 
