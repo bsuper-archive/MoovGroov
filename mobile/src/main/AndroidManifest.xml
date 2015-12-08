@@ -18,7 +18,7 @@
             android:value="MoovGroov.db" />
         <meta-data
             android:name="AA_DB_VERSION"
-            android:value="11" />
+            android:value="13" />
 
         <service
             android:name="me.bsu.moovgroovfinal.services.MobileListenerService"

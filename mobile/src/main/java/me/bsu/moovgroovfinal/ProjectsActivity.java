@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.activeandroid.query.Delete;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
@@ -21,6 +22,8 @@ import java.util.List;
 
 import me.bsu.moovgroovfinal.adapters.ProjectsListCursorAdapter;
 import me.bsu.moovgroovfinal.models.Project;
+import me.bsu.moovgroovfinal.models.Timestamp;
+import me.bsu.moovgroovfinal.models.Track;
 import me.bsu.moovgroovfinal.other.RecyclerItemClickListener;
 
 public class ProjectsActivity extends AppCompatActivity {
@@ -133,5 +136,11 @@ public class ProjectsActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void deleteEverything() {
+        new Delete().from(Timestamp.class).execute();
+        new Delete().from(Track.class).execute();
+        new Delete().from(Project.class).execute();
     }
 }

@@ -2,6 +2,8 @@ package me.bsu.moovgroovfinal.other;
 
 import android.content.Context;
 
+import com.activeandroid.ActiveAndroid;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,7 +28,6 @@ public class Utils {
 
     public static void playBeats(Context context, ArrayList<Integer> list) {
 
-
         SoundPlayer mSoundPlayer= new SoundPlayer(context);
         Sound[] soundArray = SoundStore.getSounds(context);
 
@@ -37,21 +38,23 @@ public class Utils {
             prev = list.get(i);
         }
 
-        Sound sound = soundArray[1];
+        Sound sound = soundArray[0];
         mSoundPlayer.playSound(sound);
 
         for (int j = 0; j<deltas.size(); j++){
-
-
             try {
                 Thread.sleep(deltas.get(j));                 //1000 milliseconds is one second.
             } catch(InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
             mSoundPlayer.playSound(sound);
-
-
         }
 
+    }
+
+    public static void dropTables() {
+        ActiveAndroid.execSQL("DROP TABLE IF EXISTS timestamps");
+        ActiveAndroid.execSQL("DROP TABLE IF EXISTS tracks");
+        ActiveAndroid.execSQL("DROP TABLE IF EXISTS projects");
     }
 }

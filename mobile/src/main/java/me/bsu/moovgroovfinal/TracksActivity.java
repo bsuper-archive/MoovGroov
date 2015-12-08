@@ -2,14 +2,16 @@ package me.bsu.moovgroovfinal;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
-import com.activeandroid.query.Select;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.MessageApi;
@@ -18,7 +20,6 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import me.bsu.moovgroovfinal.adapters.TracksListCursorAdapter;
@@ -43,7 +44,7 @@ public class TracksActivity extends AppCompatActivity {
 
     public List<Track> trackList;
     public List<Thread> mediaThreadList;
-    public HashMap<Track, Thread> trackThreadMap;
+    public List<Boolean> trackEnableList;
 
     private GoogleApiClient mGoogleApiClient;
 
@@ -58,11 +59,13 @@ public class TracksActivity extends AppCompatActivity {
         projectID = getIntent().getLongExtra(INTENT_PROJECT_ID, 0);
         Log.d(TAG, String.format("Got project ID %d", projectID));
 
+        Project p = Project.getProject(projectID);
+        setTitle(p.name);
+
         setupFAB();
         setupRecyclerView();
         populateTracksIfNecessary();
-        populateRecyclerView();
-
+        
         initializeMediaThreads();
         connectGoogleApiClient();
     }
@@ -88,10 +91,15 @@ public class TracksActivity extends AppCompatActivity {
 
 
     private void initializeMediaThreads(){
+
         //initialize the list of media play
-        trackList = Track.getTracks(projectID);
         mediaThreadList = new ArrayList<Thread>();
+        trackEnableList = new ArrayList<Boolean>();
+
+        trackList = Track.getTracks(projectID);
+
         for (int i = 0; i < trackList.size(); i++) {
+            trackEnableList.add(i, false);
             int type = trackList.get(i).type;
             if (type == Track.TYPE_VOCAL) {
                 String dir = trackList.get(i).filename;
@@ -99,7 +107,12 @@ public class TracksActivity extends AppCompatActivity {
                 mediaThreadList.add(i, new Thread(mdr));
             } else if (type == Track.TYPE_BEAT_LOOP) {
                 List<Timestamp> timestampList = trackList.get(i).getTimestamps();
-                BeatLoopRunnable blr = new BeatLoopRunnable(getApplicationContext(), 0, timestampList, 120);
+                Log.d(TAG, "Got " + timestampList.size() + " items");
+                ArrayList<Integer> timeList = new ArrayList<Integer>();
+                for (int j = 0; j < timestampList.size(); j++) {
+                    timeList.add(j, (int) timestampList.get(j).time);
+                }
+                BeatLoopRunnable blr = new BeatLoopRunnable(getApplicationContext(), timeList);
                 mediaThreadList.add(i, new Thread(blr));
             }
         }
@@ -154,6 +167,7 @@ public class TracksActivity extends AppCompatActivity {
 
     private void startAddVocalTrackActivity() {
         Intent i = new Intent(TracksActivity.this, RecordActivity.class);
+        i.putExtra(INTENT_PROJECT_ID, projectID);
         startActivity(i);
     }
 
@@ -166,12 +180,25 @@ public class TracksActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View view, int position) {
                 Log.d(TAG, String.format("%d clicked", position));
+                LinearLayout lnl = (LinearLayout) view.findViewById(R.id.track_item_layout);
+                ImageView imv = (ImageView) view.findViewById(R.id.list_item_play_pause);
+                if (!trackEnableList.get(position)) {
+                    trackEnableList.set(position, true);
+                    lnl.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                    imv.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                } else {
+                    trackEnableList.set(position, false);
+                    lnl.setBackgroundColor(getResources().getColor(R.color.half_black));
+                    imv.setBackgroundColor(getResources().getColor(R.color.half_black));
+                }
                 mediaThreadList.get(position).run();
+
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
                 Log.d(TAG, String.format("%d long press", position));
+
             }
         }));
     }
@@ -182,25 +209,63 @@ public class TracksActivity extends AppCompatActivity {
     }
 
     private void populateTracksIfNecessary() {
-        if (Track.getTracks(projectID).size() < 5) {
-            Project p = new Select().from(Project.class).where("Id = ?", projectID).executeSingle();
+        if (Track.getTracks(projectID).size() < 35) {
+            Project p = Project.getProject(projectID);
             Log.d(TAG, "Got Project Name: " + p.name);
 
-            String name = p.name + " kick ass";
+            String newFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
+            Log.d(TAG, "dir: " + newFileName);
+
+            String newForTrack1 = newFileName + "/testaudio.mp3";
+            String newForTrack2 = newFileName + "/testaudio2.mp3";
+
+            String name = p.name + " Track 1";
             String filename = "bogus file name";
-            Track t = new Track(name, filename, Track.TYPE_VOCAL, p);
+            Track t = new Track(name, newForTrack1, Track.TYPE_VOCAL, p);
             t.save();
 
-            String name2 = p.name + " momo";
+            String name2 = p.name + " Track 2";
             String filename2 = "haha";
-            Track t2 = new Track(name2, filename2, Track.TYPE_VOCAL, p);
+            Track t2 = new Track(name2, newForTrack2, Track.TYPE_VOCAL, p);
             t2.save();
+
+            String namebeat1 = p.name + " Beat Track 1";
+            String filename3 = "empty";
+            Track tb1 = new Track(namebeat1, filename3, Track.TYPE_BEAT_LOOP, p);
+            tb1.save();
+            Timestamp tm1 = new Timestamp(tb1, 1000);
+            Timestamp tm2 = new Timestamp(tb1, 2000);
+            Timestamp tm3 = new Timestamp(tb1, 3000);
+            Timestamp tm4 = new Timestamp(tb1, 4000);
+            tm1.save();
+            tm2.save();
+            tm3.save();
+            tm4.save();
+            Log.d(TAG, "Track has " + tb1.getTimestamps().size() + " timestamps");
+
+            String namebeat2 = p.name + " Beat Track 2";
+            String filename4 = "empty 2";
+            Track tb2 = new Track(namebeat2, filename4, Track.TYPE_BEAT_LOOP, p);
+            tb2.save();
+            Timestamp tm5 = new Timestamp(tb2, 500);
+            Timestamp tm6 = new Timestamp(tb2, 1500);
+            Timestamp tm7 = new Timestamp(tb2, 2500);
+            Timestamp tm8 = new Timestamp(tb2, 3000);
+            tm5.save();
+            tm6.save();
+            tm7.save();
+            tm8.save();
+
+
         } else {
             Log.d(TAG, Track.getTracks(projectID).size() + " items for project");
         }
     }
 
-
-
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        populateRecyclerView();
+        initializeMediaThreads();
+    }
 }

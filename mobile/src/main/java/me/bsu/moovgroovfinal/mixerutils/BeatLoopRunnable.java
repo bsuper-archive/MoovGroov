@@ -1,61 +1,68 @@
 package me.bsu.moovgroovfinal.mixerutils;
 
 import android.content.Context;
-import android.media.MediaPlayer;
 import android.os.CountDownTimer;
 
-import java.util.List;
+import java.util.ArrayList;
 
-import me.bsu.moovgroovfinal.models.Timestamp;
+import me.bsu.moovgroovfinal.sound.Sound;
+import me.bsu.moovgroovfinal.sound.SoundPlayer;
+import me.bsu.moovgroovfinal.sound.SoundStore;
 
 /**
  * Created by kirito on 12/7/15.
+ * Sound playing
  */
 public class BeatLoopRunnable implements Runnable{
-    MediaPlayer mPlayer;
-    CountDownTimer mTimer;
     Context mContext;
-    int mResourceID;
-    List<Timestamp> mLoop;
-    int mBpm;
+    ArrayList<Integer> mLoop;
     boolean isPlaying;
+    int totalTime;
+    int currTime;
+    int currBeat;
+    CountDownTimer mTimer;
 
+    SoundPlayer mSoundPlayer;
+    Sound[] soundArray;
 
-    public BeatLoopRunnable(Context c, int resid, List<Timestamp> lp, int bpm){
-        mPlayer = new MediaPlayer();
-        mTimer = new CountDownTimer(1000000, 60000/bpm) {
-            int count = 0;
+    public BeatLoopRunnable(Context c, ArrayList<Integer> lp){
+
+        mContext = c;
+        mLoop = lp;
+        isPlaying = false;
+        totalTime = lp.get(lp.size()-1);
+
+        currTime = 0;
+        currBeat = 0;
+
+        mSoundPlayer = new SoundPlayer(c);
+        soundArray = SoundStore.getSounds(c);
+
+        createTimer();
+    }
+
+    private void createTimer() {
+        mTimer = new CountDownTimer(totalTime, 1) {
+            @Override
             public void onTick(long millisUntilFinished) {
-
-//                if (mPlayer.isPlaying()) {
-//                    mPlayer.stop();
-//                }
-//                if (mLoop[count] == 1) {
-//                    mPlayer.start();
-//                }
-//
-//                if (count < 15) {
-//                    count++;
-//                } else {
-//                    count = 0;
-//                }
-
+                if (currTime == mLoop.get(currBeat)) {
+                    mSoundPlayer.playSound(soundArray[1]);
+                    currBeat++;
+                }
+                currTime++;
             }
+
+            @Override
             public void onFinish() {
-                count = 0;
+                currTime = 0;
+                currBeat = 0;
                 mTimer.start();
             }
         };
-        mContext = c;
-        mResourceID = resid;
-        mLoop = lp;
-        mBpm = bpm;
-        isPlaying = false;
     }
 
     @Override
     public void run(){
-        mPlayer = MediaPlayer.create(mContext, mResourceID);
         if (isPlaying) {
             isPlaying = false;
             mTimer.cancel();
