@@ -64,10 +64,13 @@ public class TracksActivity extends AppCompatActivity {
     }
 
     private void initializeMediaThreads(){
+
         //initialize the list of media play
-        trackEnableList = new ArrayList<Boolean>();
-        trackList = Track.getTracks(projectID);
         mediaThreadList = new ArrayList<Thread>();
+        trackEnableList = new ArrayList<Boolean>();
+
+        trackList = Track.getTracks(projectID);
+
         for (int i = 0; i < trackList.size(); i++) {
             trackEnableList.add(i, false);
             int type = trackList.get(i).type;
@@ -121,7 +124,7 @@ public class TracksActivity extends AppCompatActivity {
             public void onItemClick(View view, int position) {
                 Log.d(TAG, String.format("%d clicked", position));
                 View v = mRecyclerView.getLayoutManager().getChildAt(position);
-                LinearLayout lnl = (LinearLayout)v.findViewById(R.id.track_item_layout);
+                LinearLayout lnl = (LinearLayout) v.findViewById(R.id.track_item_layout);
                 ImageView imv = (ImageView) v.findViewById(R.id.list_item_play_pause);
                 if (!trackEnableList.get(position)) {
                     trackEnableList.set(position, true);
@@ -156,16 +159,18 @@ public class TracksActivity extends AppCompatActivity {
 
             String newFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
             Log.d(TAG, "dir: " + newFileName);
-            newFileName += "/testaudio.mp3";
+
+            String newForTrack1 = newFileName + "/testaudio.mp3";
+            String newForTrack2 = newFileName + "/testaudio2.mp3";
 
             String name = p.name + " Track 1";
             String filename = "bogus file name";
-            Track t = new Track(name, filename, Track.TYPE_VOCAL, p);
+            Track t = new Track(name, newForTrack1, Track.TYPE_VOCAL, p);
             t.save();
 
             String name2 = p.name + " Track 2";
             String filename2 = "haha";
-            Track t2 = new Track(name2, newFileName, Track.TYPE_VOCAL, p);
+            Track t2 = new Track(name2, newForTrack2, Track.TYPE_VOCAL, p);
             t2.save();
 
             String namebeat1 = p.name + " Beat Track 1";
@@ -201,7 +206,9 @@ public class TracksActivity extends AppCompatActivity {
         }
     }
 
-
-
-
+    @Override
+    protected void onResume() {
+        initializeMediaThreads();
+        super.onResume();
+    }
 }
