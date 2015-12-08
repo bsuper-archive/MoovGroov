@@ -17,11 +17,13 @@ import android.view.View;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import me.bsu.moovgroovfinal.adapters.ProjectsListCursorAdapter;
 import me.bsu.moovgroovfinal.models.Project;
 import me.bsu.moovgroovfinal.other.RecyclerItemClickListener;
+import me.bsu.moovgroovfinal.other.Utils;
 
 public class ProjectsActivity extends AppCompatActivity {
 
@@ -79,6 +81,12 @@ public class ProjectsActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View view, int position) {
                 Log.d(TAG, String.format("%d clicked", position));
+                ArrayList<Integer> list = new ArrayList<>();
+                list.add(0);
+                list.add(1000);
+                list.add(2000);
+
+                Utils.playBeats(ProjectsActivity.this, list );
                 startTracksActivity(position);
             }
 
