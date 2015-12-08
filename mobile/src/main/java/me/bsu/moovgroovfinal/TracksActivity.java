@@ -11,8 +11,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.activeandroid.query.Delete;
 import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
@@ -41,6 +44,7 @@ public class TracksActivity extends AppCompatActivity {
 
     public RecyclerView mRecyclerView;
     public TracksListCursorAdapter mAdapter;
+    public LinearLayout mMenuBackground;
 
     public List<Track> trackList;
     public List<Thread> mediaThreadList;
@@ -57,14 +61,14 @@ public class TracksActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         projectID = getIntent().getLongExtra(INTENT_PROJECT_ID, 0);
-        Log.d(TAG, String.format("Got project ID %d", projectID));
+        Log.d(TAG, String.format("Got project ID %sd", projectID));
 
         Project p = Project.getProject(projectID);
         setTitle(p.name);
 
         setupFAB();
         setupRecyclerView();
-        populateTracksIfNecessary();
+        //populateTracksIfNecessary();
 
         initializeMediaThreads();
         connectGoogleApiClient();
@@ -122,12 +126,16 @@ public class TracksActivity extends AppCompatActivity {
     }
 
     private void setupFAB() {
+
+        mMenuBackground = (LinearLayout) findViewById(R.id.track_fab_background);
+        final FloatingActionsMenu FABaddTrack = (FloatingActionsMenu) findViewById(R.id.fab_add_track);
         FloatingActionButton FABaddVocalMelody = (FloatingActionButton) findViewById(R.id.fab_add_vocal_melody_track);
         FloatingActionButton FABaddBeatLoop = (FloatingActionButton) findViewById(R.id.fab_add_beat_loop_track);
         FABaddVocalMelody.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "FAB Add Vocal Melody clicked");
+                FABaddTrack.collapse();
                 startAddVocalTrackActivity();
             }
         });
@@ -135,7 +143,7 @@ public class TracksActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "FAB Add Beat Loop clicked");
-
+                FABaddTrack.collapse();
                 // Start Beats Activity on Mobile
                 Intent intent = new Intent(v.getContext(), BeatsActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -145,9 +153,19 @@ public class TracksActivity extends AppCompatActivity {
                 // Send Message to Watch to start beats
                 String msg = "START";
                 // Send message to Phone.
-                sendMessage( START_WATCH_BEATS_ACTIVITY, msg);
+                sendMessage(START_WATCH_BEATS_ACTIVITY, msg);
                 Log.d("MOBILE BEAT", "Start Beat");
+            }
+        });
+        FABaddTrack.setOnFloatingActionsMenuUpdateListener(new FloatingActionsMenu.OnFloatingActionsMenuUpdateListener() {
+            @Override
+            public void onMenuExpanded() {
+                mMenuBackground.setVisibility(View.VISIBLE);
+            }
 
+            @Override
+            public void onMenuCollapsed() {
+                mMenuBackground.setVisibility(View.INVISIBLE);
             }
         });
     }
@@ -183,18 +201,28 @@ public class TracksActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View view, int position) {
                 Log.d(TAG, String.format("%d clicked", position));
-                LinearLayout lnl = (LinearLayout) view.findViewById(R.id.track_item_layout);
-                ImageView imv = (ImageView) view.findViewById(R.id.list_item_play_pause);
-                if (!trackEnableList.get(position)) {
-                    trackEnableList.set(position, true);
-                    lnl.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                    imv.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+
+                final TextView txtDelete = (TextView) view.findViewById(R.id.project_delete);
+                if (txtDelete.isEnabled()) {
+                    txtDelete.callOnClick();
+                    txtDelete.setEnabled(false);
+                    txtDelete.setVisibility(View.INVISIBLE);
+                    populateRecyclerView();
                 } else {
-                    trackEnableList.set(position, false);
-                    lnl.setBackgroundColor(getResources().getColor(R.color.half_black));
-                    imv.setBackgroundColor(getResources().getColor(R.color.half_black));
+                    LinearLayout lnl = (LinearLayout) view.findViewById(R.id.track_item_layout);
+                    ImageView imv = (ImageView) view.findViewById(R.id.list_item_play_pause);
+                    if (!trackEnableList.get(position)) {
+                        trackEnableList.set(position, true);
+                        lnl.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                        imv.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                    } else {
+                        trackEnableList.set(position, false);
+                        lnl.setBackgroundColor(getResources().getColor(R.color.half_black));
+                        imv.setBackgroundColor(getResources().getColor(R.color.half_black));
+                    }
+                    mediaThreadList.get(position).run();
                 }
-                mediaThreadList.get(position).run();
+
 
             }
 
@@ -202,9 +230,40 @@ public class TracksActivity extends AppCompatActivity {
             public void onItemLongClick(View view, int position) {
                 Log.d(TAG, String.format("%d long press", position));
 
+                final Track t = Track.getTracks(projectID).get(position);
+                final TextView txtDelete = (TextView) view.findViewById(R.id.project_delete);
+                if (txtDelete.isEnabled()) {
+                    txtDelete.setEnabled(false);
+                    txtDelete.setVisibility(View.INVISIBLE);
+                    Log.d(TAG, "track deletion deactivated");
+                } else {
+                    txtDelete.setEnabled(true);
+                    txtDelete.setVisibility(View.VISIBLE);
+                    Log.d(TAG, "track deletion activated");
+                    txtDelete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            deleteTrack(t);
+                        }
+                    });
+                }
+
             }
         }));
     }
+
+    private void deleteTrack(Track t) {
+
+        Log.d(TAG, "Track name: " + t.name + ", id: " + t.getId());
+
+        if (t.type == Track.TYPE_BEAT_LOOP) {
+            new Delete().from(Timestamp.class).where("track = ?", t.getId()).execute();
+            Log.d(TAG, "timestamps deleted from " + t.name);
+        }
+        new Delete().from(Track.class).where("Id = ?", t.getId()).execute();
+
+    }
+
 
     private void populateRecyclerView() {
         mAdapter = new TracksListCursorAdapter(Track.getTracksCursor(projectID), this);
@@ -270,5 +329,25 @@ public class TracksActivity extends AppCompatActivity {
         super.onResume();
         populateRecyclerView();
         initializeMediaThreads();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        for (int i = 0; i < mediaThreadList.size(); i++) {
+            if (trackEnableList.get(i)) {
+                mediaThreadList.get(i).run();
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        for (int i = 0; i < mediaThreadList.size(); i++) {
+            if (trackEnableList.get(i)) {
+                mediaThreadList.get(i).run();
+            }
+        }
+        super.onDestroy();
     }
 }

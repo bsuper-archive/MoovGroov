@@ -36,7 +36,8 @@
         app:fab_addButtonPlusIconColor="@color/white"
         app:fab_labelStyle="@style/menu_labels_style"
         android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin">
+        android:layout_margin="@dimen/fab_margin"
+        android:elevation="100dp">
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_add_vocal_melody_track"
@@ -55,6 +56,7 @@
             app:fab_title="Create a Beat Loop"
             app:fab_colorPressed="@color/pink_pressed"
             android:src="@drawable/ic_music_note_white_48dp"/>
+
 
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
