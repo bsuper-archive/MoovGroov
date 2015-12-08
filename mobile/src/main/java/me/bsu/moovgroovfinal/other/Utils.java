@@ -26,7 +26,6 @@ public class Utils {
 
     public static void playBeats(Context context, ArrayList<Integer> list) {
 
-
         SoundPlayer mSoundPlayer= new SoundPlayer(context);
         Sound[] soundArray = SoundStore.getSounds(context);
 
@@ -41,16 +40,12 @@ public class Utils {
         mSoundPlayer.playSound(sound);
 
         for (int j = 0; j<deltas.size(); j++){
-
-
             try {
                 Thread.sleep(deltas.get(j));                 //1000 milliseconds is one second.
             } catch(InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
             mSoundPlayer.playSound(sound);
-
-
         }
 
     }
