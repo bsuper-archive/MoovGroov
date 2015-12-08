@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.activeandroid.query.Select;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -52,15 +51,13 @@ public class TracksActivity extends AppCompatActivity {
         projectID = getIntent().getLongExtra(INTENT_PROJECT_ID, 0);
         Log.d(TAG, String.format("Got project ID %d", projectID));
 
-        Project p = new Select().from(Project.class).where("Id = ?", projectID).executeSingle();
+        Project p = Project.getProject(projectID);
         setTitle(p.name);
 
         setupFAB();
         setupRecyclerView();
         populateTracksIfNecessary();
-        populateRecyclerView();
 
-        initializeMediaThreads();
     }
 
     private void initializeMediaThreads(){
@@ -111,6 +108,7 @@ public class TracksActivity extends AppCompatActivity {
 
     private void startAddVocalTrackActivity() {
         Intent i = new Intent(TracksActivity.this, RecordActivity.class);
+        i.putExtra(INTENT_PROJECT_ID, projectID);
         startActivity(i);
     }
 
@@ -123,9 +121,8 @@ public class TracksActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View view, int position) {
                 Log.d(TAG, String.format("%d clicked", position));
-                View v = mRecyclerView.getLayoutManager().getChildAt(position);
-                LinearLayout lnl = (LinearLayout) v.findViewById(R.id.track_item_layout);
-                ImageView imv = (ImageView) v.findViewById(R.id.list_item_play_pause);
+                LinearLayout lnl = (LinearLayout) view.findViewById(R.id.track_item_layout);
+                ImageView imv = (ImageView) view.findViewById(R.id.list_item_play_pause);
                 if (!trackEnableList.get(position)) {
                     trackEnableList.set(position, true);
                     lnl.setBackgroundColor(getResources().getColor(R.color.colorAccent));
@@ -154,7 +151,7 @@ public class TracksActivity extends AppCompatActivity {
 
     private void populateTracksIfNecessary() {
         if (Track.getTracks(projectID).size() < 35) {
-            Project p = new Select().from(Project.class).where("Id = ?", projectID).executeSingle();
+            Project p = Project.getProject(projectID);
             Log.d(TAG, "Got Project Name: " + p.name);
 
             String newFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -208,7 +205,8 @@ public class TracksActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        initializeMediaThreads();
         super.onResume();
+        populateRecyclerView();
+        initializeMediaThreads();
     }
 }

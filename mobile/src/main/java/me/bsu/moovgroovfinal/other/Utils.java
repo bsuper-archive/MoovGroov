@@ -2,6 +2,8 @@ package me.bsu.moovgroovfinal.other;
 
 import android.content.Context;
 
+import com.activeandroid.ActiveAndroid;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,5 +50,11 @@ public class Utils {
             mSoundPlayer.playSound(sound);
         }
 
+    }
+
+    public static void dropTables() {
+        ActiveAndroid.execSQL("DROP TABLE IF EXISTS timestamps");
+        ActiveAndroid.execSQL("DROP TABLE IF EXISTS tracks");
+        ActiveAndroid.execSQL("DROP TABLE IF EXISTS projects");
     }
 }
