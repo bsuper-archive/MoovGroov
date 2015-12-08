@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import me.bsu.moovgroovfinal.adapters.TracksListCursorAdapter;
+import me.bsu.moovgroovfinal.mixerutils.BeatLoopRunnable;
 import me.bsu.moovgroovfinal.mixerutils.MediaRunnable;
 import me.bsu.moovgroovfinal.models.Project;
 import me.bsu.moovgroovfinal.models.Timestamp;
@@ -51,6 +52,10 @@ public class TracksActivity extends AppCompatActivity {
         populateTracksIfNecessary();
         populateRecyclerView();
 
+        initializeMediaThreads();
+    }
+
+    private void initializeMediaThreads(){
         //initialize the list of media play
         trackList = Track.getTracks(projectID);
         mediaThreadList = new ArrayList<Thread>();
@@ -62,6 +67,8 @@ public class TracksActivity extends AppCompatActivity {
                 mediaThreadList.add(i, new Thread(mdr));
             } else if (type == Track.TYPE_BEAT_LOOP) {
                 List<Timestamp> timestampList = trackList.get(i).getTimestamps();
+                BeatLoopRunnable blr = new BeatLoopRunnable(getApplicationContext(), 0, timestampList, 120);
+                mediaThreadList.add(i, new Thread(blr));
             }
         }
     }
@@ -75,7 +82,7 @@ public class TracksActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View view, int position) {
                 Log.d(TAG, String.format("%d clicked", position));
-
+                mediaThreadList.get(position).run();
             }
 
             @Override
