@@ -23,7 +23,7 @@ public class Track extends Model {
 
     @Column(name = "project")
     public Project project;
-
+    
     public Track() {
         super();
     }
