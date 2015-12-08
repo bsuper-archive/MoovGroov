@@ -1,67 +1,57 @@
 package me.bsu.moovgroovfinal.mixerutils;
 
 import android.content.Context;
-import android.media.MediaPlayer;
-import android.os.CountDownTimer;
 
-import java.util.List;
+import java.util.ArrayList;
 
-import me.bsu.moovgroovfinal.models.Timestamp;
+import me.bsu.moovgroovfinal.other.Utils;
+import me.bsu.moovgroovfinal.sound.Sound;
+import me.bsu.moovgroovfinal.sound.SoundPlayer;
+import me.bsu.moovgroovfinal.sound.SoundStore;
 
 /**
  * Created by kirito on 12/7/15.
  */
 public class BeatLoopRunnable implements Runnable{
-    MediaPlayer mPlayer;
-    CountDownTimer mTimer;
     Context mContext;
-    int mResourceID;
-    List<Timestamp> mLoop;
-    int mBpm;
+    ArrayList<Integer> mLoop;
     boolean isPlaying;
 
-
-    public BeatLoopRunnable(Context c, int resid, List<Timestamp> lp, int bpm){
-        mPlayer = new MediaPlayer();
-        mTimer = new CountDownTimer(1000000, 60000/bpm) {
-            int count = 0;
-            public void onTick(long millisUntilFinished) {
-
-//                if (mPlayer.isPlaying()) {
-//                    mPlayer.stop();
-//                }
-//                if (mLoop[count] == 1) {
-//                    mPlayer.start();
-//                }
-//
-//                if (count < 15) {
-//                    count++;
-//                } else {
-//                    count = 0;
-//                }
-
-            }
-            public void onFinish() {
-                count = 0;
-                mTimer.start();
-            }
-        };
+    public BeatLoopRunnable(Context c, ArrayList<Integer> lp){
         mContext = c;
-        mResourceID = resid;
         mLoop = lp;
-        mBpm = bpm;
         isPlaying = false;
+    }
+    public static void playBeats(Context context, ArrayList<Integer> list) {
+
+        SoundPlayer mSoundPlayer= new SoundPlayer(context);
+        Sound[] soundArray = SoundStore.getSounds(context);
+
+        ArrayList<Integer> deltas = new ArrayList<>();
+        Integer prev = list.get(0);
+        for (int i = 1; i<list.size(); i++){
+            deltas.add(list.get(i)-prev);
+            prev = list.get(i);
+        }
+
+        Sound sound = soundArray[1];
+        mSoundPlayer.playSound(sound);
+
+        for (int j = 0; j<deltas.size(); j++){
+            try {
+                Thread.sleep(deltas.get(j));                 //1000 milliseconds is one second.
+            } catch(InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mSoundPlayer.playSound(sound);
+        }
+
     }
 
     @Override
     public void run(){
-        mPlayer = MediaPlayer.create(mContext, mResourceID);
-        if (isPlaying) {
-            isPlaying = false;
-            mTimer.cancel();
-        } else {
-            isPlaying = true;
-            mTimer.start();
+        if (!isPlaying) {
+            Utils.playBeats(mContext, mLoop);
         }
     }
 }

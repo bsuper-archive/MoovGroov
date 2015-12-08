@@ -8,6 +8,7 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
+import java.util.Collections;
 import java.util.List;
 
 @Table(name = "Tracks")
@@ -66,7 +67,9 @@ public class Track extends Model {
     }
 
     public List<Timestamp> getTimestamps() {
-        List<Timestamp> timestamps = getMany(Timestamp.class, "track");
+//        List<Timestamp> timestamps = getMany(Timestamp.class, "track");
+        List<Timestamp> timestamps = new Select().from(Timestamp.class).where("track = ?", this.getId()).execute();
+        Collections.sort(timestamps);
         return timestamps;
     }
 }

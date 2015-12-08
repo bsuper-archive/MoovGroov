@@ -5,7 +5,7 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
 @Table(name = "Timestamp")
-public class Timestamp extends Model {
+public class Timestamp extends Model implements Comparable<Timestamp> {
 
     @Column(name = "time")
     public long time;
@@ -13,9 +13,18 @@ public class Timestamp extends Model {
     @Column(name = "track")
     public Track track;
 
+    public Timestamp() {
+        this.track = new Track();
+        this.time = 0;
+    }
+
     public Timestamp(Track track, long time) {
         this.track = track;
         this.time = time;
     }
 
+    @Override
+    public int compareTo(Timestamp another) {
+        return ((Long) time).compareTo(another.time);
+    }
 }
