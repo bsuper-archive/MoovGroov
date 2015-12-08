@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+        <string-array name="labels">
+
+            <item>Clap</item>
+            <item>Crash</item>
+        </string-array>
+
+        <integer-array name="ids">
+
+            <item>@raw/cp</item>
+            <item>@raw/crash</item>
+        </integer-array>
+
+</resources>

@@ -1,6 +1,9 @@
 package me.bsu.moovgroovfinal.other;
 
+import android.content.Context;
+
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
@@ -15,5 +18,35 @@ public class Utils {
 
     public static TimeZone getUserTimezone() {
         return SimpleTimeZone.getDefault();
+    }
+
+    public static void playBeats(Context context, ArrayList<Integer> list) {
+
+        SoundPlayer  mSoundPlayer= new SoundPlayer(context);
+        Sound[] soundArray = SoundStore.getSounds(context);
+
+        ArrayList<Integer> deltas = new ArrayList<>();
+        Integer prev = list.get(0);
+        for (int i = 1; i<list.size(); i++){
+            deltas.add(list.get(i)-prev);
+            prev = list.get(i);
+        }
+
+        Sound sound = soundArray[1];
+        mSoundPlayer.playSound(sound);
+
+        for (int j = 0; j<deltas.size(); j++){
+
+
+            try {
+                Thread.sleep(deltas.get(j));                 //1000 milliseconds is one second.
+            } catch(InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+            mSoundPlayer.playSound(sound);
+
+
+        }
+
     }
 }
