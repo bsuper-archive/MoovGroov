@@ -14,10 +14,18 @@
         android:layout_height="108dp"
         android:text="Record"/>
 
+
+
     <Button
         android:id="@+id/play_button"
         android:layout_width="match_parent"
         android:layout_height="108dp"
         android:text="Play"/>
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageButton"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/banner"/>
 
 </LinearLayout>

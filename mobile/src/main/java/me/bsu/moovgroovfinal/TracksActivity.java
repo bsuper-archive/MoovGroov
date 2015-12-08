@@ -57,9 +57,7 @@ public class TracksActivity extends AppCompatActivity {
         setupFAB();
         setupRecyclerView();
         populateTracksIfNecessary();
-        populateRecyclerView();
 
-        initializeMediaThreads();
     }
 
     private void initializeMediaThreads(){
@@ -123,9 +121,8 @@ public class TracksActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View view, int position) {
                 Log.d(TAG, String.format("%d clicked", position));
-                View v = mRecyclerView.getLayoutManager().getChildAt(position);
-                LinearLayout lnl = (LinearLayout) v.findViewById(R.id.track_item_layout);
-                ImageView imv = (ImageView) v.findViewById(R.id.list_item_play_pause);
+                LinearLayout lnl = (LinearLayout) view.findViewById(R.id.track_item_layout);
+                ImageView imv = (ImageView) view.findViewById(R.id.list_item_play_pause);
                 if (!trackEnableList.get(position)) {
                     trackEnableList.set(position, true);
                     lnl.setBackgroundColor(getResources().getColor(R.color.colorAccent));
@@ -208,7 +205,8 @@ public class TracksActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        initializeMediaThreads();
         super.onResume();
+        populateRecyclerView();
+        initializeMediaThreads();
     }
 }
