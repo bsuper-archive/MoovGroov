@@ -13,6 +13,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.Wearable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +35,7 @@ public class TracksActivity extends AppCompatActivity {
     public static final String TAG = "TRACKS_ACTIVITY";
 
     public static final String INTENT_PROJECT_ID = "TRACKS_ACTIVITY.PROJECT_ID";
+    private static final String START_WATCH_BEATS_ACTIVITY = "/watch_beats_activity";
 
     public long projectID;
 
@@ -39,6 +45,8 @@ public class TracksActivity extends AppCompatActivity {
     public List<Track> trackList;
     public List<Thread> mediaThreadList;
     public List<Boolean> trackEnableList;
+
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,13 +66,38 @@ public class TracksActivity extends AppCompatActivity {
         setupRecyclerView();
         populateTracksIfNecessary();
 
+        initializeMediaThreads();
+        connectGoogleApiClient();
     }
 
+    private void connectGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Wearable.API)
+                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                    @Override
+                    public void onConnected(Bundle connectionHint) {
+                        Log.d("MOBILE", "SERVICE CONNECTED TO GOOGLE API");
+                        /* Successfully connected */
+                    }
+                    @Override
+                    public void onConnectionSuspended(int cause) {
+                        Log.d("MOBILE", "SERVICE SUSPEEDED FROM GOOGLE API");
+                        /* Connection was interrupted */
+                    }
+                })
+                .build();
+        mGoogleApiClient.connect();
+    }
+
+
     private void initializeMediaThreads(){
+
 
         //initialize the list of media play
         mediaThreadList = new ArrayList<Thread>();
         trackEnableList = new ArrayList<Boolean>();
+        mediaThreadList.clear();
+        trackEnableList.clear();
 
         trackList = Track.getTracks(projectID);
 
@@ -102,8 +135,37 @@ public class TracksActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "FAB Add Beat Loop clicked");
+
+                // Start Beats Activity on Mobile
+                Intent intent = new Intent(v.getContext(), BeatsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra("projectID", projectID);
+                startActivity(intent);
+
+                // Send Message to Watch to start beats
+                String msg = "START";
+                // Send message to Phone.
+                sendMessage( START_WATCH_BEATS_ACTIVITY, msg);
+                Log.d("MOBILE BEAT", "Start Beat");
+
             }
         });
+    }
+
+    // Send message through api to Watch
+    private void sendMessage(final String path, final String text ) {
+        Log.d("MOBILE SEND MESSAGE", "Start Beat 1");
+        new Thread( new Runnable() {
+            @Override
+            public void run() {
+                NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes( mGoogleApiClient ).await();
+                for(Node node : nodes.getNodes()) {
+                    Log.d("MOBILE SEND MESSAGE", "Start Beat with NODES");
+                    MessageApi.SendMessageResult result = Wearable.MessageApi.sendMessage(
+                            mGoogleApiClient, node.getId(), path, text.getBytes() ).await();
+                }
+            }
+        }).start();
     }
 
     private void startAddVocalTrackActivity() {

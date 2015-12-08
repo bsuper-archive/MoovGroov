@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    tools:context="me.bsu.moovgroovfinal.BeatRecordActivity">
+
+    <!--<ImageButton-->
+        <!--android:id="@+id/tempButton"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:scaleType="fitXY"/>-->
+
+    <ImageButton android:id="@+id/tempButton"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="@string/hello_round"
+        android:scaleType="fitXY"
+        android:src="@drawable/seqready"
+        android:background="@android:color/transparent" />
+
+</RelativeLayout>

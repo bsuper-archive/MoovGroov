@@ -54,6 +54,7 @@ public class BeatLoopRunnable implements Runnable{
 
             @Override
             public void onFinish() {
+                mSoundPlayer.playSound(soundArray[1]);
                 currTime = 0;
                 currBeat = 0;
                 mTimer.start();

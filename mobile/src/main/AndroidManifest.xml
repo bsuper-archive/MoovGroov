@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="me.bsu.moovgroovfinal"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="me.bsu.moovgroovfinal" >
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -12,8 +12,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-
+        android:theme="@style/AppTheme" >
         <meta-data
             android:name="AA_DB_NAME"
             android:value="MoovGroov.db" />
@@ -21,28 +20,40 @@
             android:name="AA_DB_VERSION"
             android:value="13" />
 
+        <service
+            android:name="me.bsu.moovgroovfinal.services.MobileListenerService"
+            android:label="@string/app_name"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
+            </intent-filter>
+        </service>
+
         <activity
             android:name=".ProjectsActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".TracksActivity"
             android:label="@string/title_activity_tracks"
             android:parentActivityName=".ProjectsActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="me.bsu.moovgroovfinal.ProjectsActivity"/>
+                android:value="me.bsu.moovgroovfinal.ProjectsActivity" />
         </activity>
-        <activity
-            android:name=".RecordActivity" >
+        <activity android:name=".RecordActivity" >
         </activity>
+        <activity android:name=".BeatsActivity" >
+        </activity>
+
     </application>
 
 </manifest>
