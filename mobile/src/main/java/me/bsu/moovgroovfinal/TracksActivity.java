@@ -13,12 +13,16 @@ import com.activeandroid.query.Select;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import me.bsu.moovgroovfinal.adapters.TracksListCursorAdapter;
+import me.bsu.moovgroovfinal.mixerutils.BeatLoopRunnable;
+import me.bsu.moovgroovfinal.mixerutils.MediaRunnable;
 import me.bsu.moovgroovfinal.models.Project;
+import me.bsu.moovgroovfinal.models.Timestamp;
 import me.bsu.moovgroovfinal.models.Track;
 import me.bsu.moovgroovfinal.other.RecyclerItemClickListener;
-import me.bsu.moovgroovfinal.other.Utils;
 
 public class TracksActivity extends AppCompatActivity {
 
@@ -30,6 +34,10 @@ public class TracksActivity extends AppCompatActivity {
 
     public RecyclerView mRecyclerView;
     public TracksListCursorAdapter mAdapter;
+
+    public List<Track> trackList;
+    public List<Thread> mediaThreadList;
+    public HashMap<Track, Thread> trackThreadMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +54,26 @@ public class TracksActivity extends AppCompatActivity {
         setupRecyclerView();
         populateTracksIfNecessary();
         populateRecyclerView();
+
+        initializeMediaThreads();
+    }
+
+    private void initializeMediaThreads(){
+        //initialize the list of media play
+        trackList = Track.getTracks(projectID);
+        mediaThreadList = new ArrayList<Thread>();
+        for (int i = 0; i < trackList.size(); i++) {
+            int type = trackList.get(i).type;
+            if (type == Track.TYPE_VOCAL) {
+                String dir = trackList.get(i).filename;
+                MediaRunnable mdr = new MediaRunnable(getApplicationContext(), dir);
+                mediaThreadList.add(i, new Thread(mdr));
+            } else if (type == Track.TYPE_BEAT_LOOP) {
+                List<Timestamp> timestampList = trackList.get(i).getTimestamps();
+                BeatLoopRunnable blr = new BeatLoopRunnable(getApplicationContext(), 0, timestampList, 120);
+                mediaThreadList.add(i, new Thread(blr));
+            }
+        }
     }
 
     private void setupFAB() {
@@ -81,13 +109,7 @@ public class TracksActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View view, int position) {
                 Log.d(TAG, String.format("%d clicked", position));
-                // play sound here
-                ArrayList<Integer> list = new ArrayList<>();
-                list.add(0);
-                list.add(1000);
-                list.add(2000);
-
-                Utils.playBeats(TracksActivity.this, list );
+                mediaThreadList.get(position).run();
             }
 
             @Override
@@ -109,12 +131,12 @@ public class TracksActivity extends AppCompatActivity {
 
             String name = p.name + " kick ass";
             String filename = "bogus file name";
-            Track t = new Track(name, filename, p);
+            Track t = new Track(name, filename, Track.TYPE_VOCAL, p);
             t.save();
 
             String name2 = p.name + " momo";
             String filename2 = "haha";
-            Track t2 = new Track(name2, filename2, p);
+            Track t2 = new Track(name2, filename2, Track.TYPE_VOCAL, p);
             t2.save();
         } else {
             Log.d(TAG, Track.getTracks(projectID).size() + " items for project");
