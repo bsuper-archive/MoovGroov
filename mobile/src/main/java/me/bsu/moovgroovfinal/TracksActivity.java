@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.activeandroid.query.Select;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -52,7 +51,7 @@ public class TracksActivity extends AppCompatActivity {
         projectID = getIntent().getLongExtra(INTENT_PROJECT_ID, 0);
         Log.d(TAG, String.format("Got project ID %d", projectID));
 
-        Project p = new Select().from(Project.class).where("Id = ?", projectID).executeSingle();
+        Project p = Project.getProject(projectID);
         setTitle(p.name);
 
         setupFAB();
@@ -152,7 +151,7 @@ public class TracksActivity extends AppCompatActivity {
 
     private void populateTracksIfNecessary() {
         if (Track.getTracks(projectID).size() < 35) {
-            Project p = new Select().from(Project.class).where("Id = ?", projectID).executeSingle();
+            Project p = Project.getProject(projectID);
             Log.d(TAG, "Got Project Name: " + p.name);
 
             String newFileName = Environment.getExternalStorageDirectory().getAbsolutePath();

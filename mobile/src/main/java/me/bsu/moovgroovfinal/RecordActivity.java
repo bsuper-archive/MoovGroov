@@ -17,6 +17,9 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import java.io.File;
 import java.io.IOException;
 
+import me.bsu.moovgroovfinal.models.Project;
+import me.bsu.moovgroovfinal.models.Track;
+
 // http://developer.android.com/guide/topics/media/audio-capture.html
 public class RecordActivity extends Activity {
     private static final String TAG = "RecordActivity";
@@ -53,40 +56,17 @@ public class RecordActivity extends Activity {
 
     private void startPlaying() {
         mPlayer = new MediaPlayer();
-
-        // Pop up Dialog to get save filename
-        new MaterialDialog.Builder(RecordActivity.this)
-                .title("Play Sound Recording")
-                .inputType(InputType.TYPE_CLASS_TEXT)
-                .input("Sound Filename", "", new MaterialDialog.InputCallback() {
-                    @Override
-                    public void onInput(MaterialDialog dialog, CharSequence input) {
-                        // Do something
-                    }
-                })
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        String fileName = dialog.getInputEditText().getText().toString();
-                        Log.d("RECORD", "EDITEXT: %s".format(dialog.getInputEditText().getText().toString()));
-                        String newFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
-                        newFileName += "/" + fileName + ".mp4";
-
-//                        Track t = new Track("Vocals", newFileName, Track.TYPE_VOCAL, )
-
-                        try {
-                            mPlayer.setDataSource(newFileName);
-                            mPlayer.prepare();
-                            mPlayer.start();
-                        } catch (IOException e) {
-                            Log.e(TAG, "prepare() failed");
-                        }
-                    }
-                }).show();
-
-
-
-
+        if (!mFilePath.equals("")) {
+            try {
+                mPlayer.setDataSource(mFilePath);
+                mPlayer.prepare();
+                mPlayer.start();
+            } catch (IOException e) {
+                Log.d(TAG, "Cannot get file");
+            }
+        } else {
+            Log.d(TAG, "No file created yet");
+        }
     }
 
     private void stopPlaying() {
@@ -138,10 +118,13 @@ public class RecordActivity extends Activity {
                         File file = new File(tempFilename);
                         File file2 = new File(mFilePath);
                         boolean success = file.renameTo(file2);
+
+                        Track t = new Track("Vocal Recording", mFilePath, Track.TYPE_VOCAL, Project.getProject(projectID));
+                        t.save();
                     }
                 }).show();
     }
-    
+
     private void setupButtons() {
         mRecordButton = (Button) findViewById(R.id.record_button);
         mPlayButton = (Button) findViewById(R.id.play_button);
@@ -149,11 +132,11 @@ public class RecordActivity extends Activity {
             @Override
             public void onClick(View v) {
                 onRecord(mStartRecording);
-//                if (mStartRecording) {
-//                    setText("Stop recording");
-//                } else {
-//                    setText("Start recording");
-//                }
+                if (mStartRecording) {
+                    mRecordButton.setText("Stop recording");
+                } else {
+                    mRecordButton.setText("Start recording");
+                }
                 mStartRecording = !mStartRecording;
             }
         });
@@ -161,11 +144,11 @@ public class RecordActivity extends Activity {
             @Override
             public void onClick(View v) {
                 onPlay(mStartPlaying);
-//                if (mStartPlaying) {
-//                    setText("Stop playing");
-//                } else {
-//                    setText("Start playing");
-//                }
+                if (mStartPlaying) {
+                    mPlayButton.setText("Stop playing");
+                } else {
+                    mPlayButton.setText("Start playing");
+                }
                 mStartPlaying = !mStartPlaying;
             }
         });

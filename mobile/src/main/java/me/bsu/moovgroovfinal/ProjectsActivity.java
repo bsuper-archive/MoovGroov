@@ -67,8 +67,6 @@ public class ProjectsActivity extends AppCompatActivity {
             }
         });
 
-        deleteEverything();
-
         populateDBifNecessary();
         setupRecyclerView();
         populateRecyclerView();
