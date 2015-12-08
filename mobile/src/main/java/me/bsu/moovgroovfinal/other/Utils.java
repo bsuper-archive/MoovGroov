@@ -8,6 +8,10 @@ import java.util.Date;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 
+import me.bsu.moovgroovfinal.sound.Sound;
+import me.bsu.moovgroovfinal.sound.SoundPlayer;
+import me.bsu.moovgroovfinal.sound.SoundStore;
+
 public class Utils {
     public static String convertUnixTimestampToLocalTimestampString(long unixTS) {
         Date date = new Date(unixTS);
@@ -22,7 +26,8 @@ public class Utils {
 
     public static void playBeats(Context context, ArrayList<Integer> list) {
 
-        SoundPlayer  mSoundPlayer= new SoundPlayer(context);
+
+        SoundPlayer mSoundPlayer= new SoundPlayer(context);
         Sound[] soundArray = SoundStore.getSounds(context);
 
         ArrayList<Integer> deltas = new ArrayList<>();
