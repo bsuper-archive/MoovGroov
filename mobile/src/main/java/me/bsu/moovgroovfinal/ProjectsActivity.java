@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.activeandroid.query.Delete;
 import com.afollestad.materialdialogs.DialogAction;
@@ -67,9 +68,9 @@ public class ProjectsActivity extends AppCompatActivity {
             }
         });
 
-        deleteEverything();
+        //deleteEverything();
 
-        populateDBifNecessary();
+        //populateDBifNecessary();
         setupRecyclerView();
         populateRecyclerView();
 
@@ -84,12 +85,38 @@ public class ProjectsActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View view, int position) {
                 Log.d(TAG, String.format("%d clicked", position));
-                startTracksActivity(position);
+                final TextView txtDelete = (TextView) view.findViewById(R.id.project_delete);
+                if (txtDelete.isEnabled()) {
+                    txtDelete.callOnClick();
+                    txtDelete.setEnabled(false);
+                    txtDelete.setVisibility(View.INVISIBLE);
+                    populateRecyclerView();
+                } else {
+                    startTracksActivity(position);
+                }
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
                 Log.d(TAG, String.format("%d long press", position));
+                Project p = Project.getAllProjects().get(position);
+                final long pid = p.getId();
+                final TextView txtDelete = (TextView) view.findViewById(R.id.project_delete);
+                if (txtDelete.isEnabled()) {
+                    txtDelete.setEnabled(false);
+                    txtDelete.setVisibility(View.INVISIBLE);
+                    Log.d(TAG,"proj deletion deactivated");
+                } else {
+                    txtDelete.setEnabled(true);
+                    txtDelete.setVisibility(View.VISIBLE);
+                    Log.d(TAG, "proj deletion activated");
+                    txtDelete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            deleteProject(pid);
+                        }
+                    });
+                }
             }
         }));
     }
@@ -118,6 +145,28 @@ public class ProjectsActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private void deleteProject(long projectId) {
+
+        Project p = Project.getProject(projectId);
+        Log.d(TAG, "Project name: "+p.name +", id: "+p.getId());
+
+        List<Track> tracks =  p.tracks();
+
+        for (int i = 0; i < tracks.size(); i++) {
+            Log.d(TAG, "Examing track: "+tracks.get(i).name);
+
+            if (tracks.get(i).type == Track.TYPE_BEAT_LOOP) {
+                new Delete().from(Timestamp.class).where("track = ?", tracks.get(i).getId()).execute();
+                Log.d(TAG, "timestamps deleted from " + tracks.get(i).name);
+            }
+
+        }
+
+        new Delete().from(Track.class).where("project = ?", projectId).execute();
+
+        new Delete().from(Project.class).where("Id = ?", projectId).execute();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -134,9 +183,11 @@ public class ProjectsActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            deleteEverything();
+            Log.d(TAG, "Database Reset!");
+            populateRecyclerView();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 

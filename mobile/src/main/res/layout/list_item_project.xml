@@ -7,35 +7,56 @@
     android:weightSum="1"
     android:padding="5dp">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/half_black">
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/list_item_name"
-        android:layout_width="0dp"
-        android:layout_weight=".6"
-        android:layout_height="match_parent"
-        android:gravity="center_vertical"
-        android:layout_marginLeft="40dp"
-        android:textSize="20dp"
-        android:text="Project1"
-        android:textStyle="bold"
-        android:textColor="#ffffff" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/half_black">
 
-    <TextView
-        android:id="@+id/list_item_last_modified"
-        android:layout_width="0dp"
-        android:layout_weight=".4"
-        android:layout_height="match_parent"
-        android:layout_marginRight="16dp"
-        android:gravity="center"
-        android:textSize="17dp"
-        android:text="12/05/15 8:15pm"
-        android:textColor="#0ABAB5"/>
+            <TextView
+                android:id="@+id/list_item_name"
+                android:layout_width="0dp"
+                android:layout_weight=".6"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:layout_marginLeft="40dp"
+                android:textSize="20dp"
+                android:text="Project1"
+                android:textStyle="bold"
+                android:textColor="#ffffff" />
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/list_item_last_modified"
+                android:layout_width="0dp"
+                android:layout_weight=".4"
+                android:layout_height="match_parent"
+                android:layout_marginRight="16dp"
+                android:gravity="center"
+                android:textSize="17dp"
+                android:text="12/05/15 8:15pm"
+                android:textColor="#0ABAB5"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/project_delete"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="DELETE"
+            android:textColor="@color/colorTextIcon"
+            android:background="@color/deletion_activated"
+            android:visibility="invisible"
+            android:enabled="false"
+            android:textSize="40dp"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:gravity="center_vertical"/>
+
+
+    </FrameLayout>
 
 </LinearLayout>
 

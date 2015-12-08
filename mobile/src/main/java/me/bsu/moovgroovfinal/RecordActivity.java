@@ -1,11 +1,11 @@
 package me.bsu.moovgroovfinal;
 
-import android.app.Activity;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -20,8 +20,8 @@ import java.io.IOException;
 import me.bsu.moovgroovfinal.models.Project;
 import me.bsu.moovgroovfinal.models.Track;
 
-// http://developer.android.com/guide/topics/media/audio-capture.html
-public class RecordActivity extends Activity {
+public class RecordActivity extends AppCompatActivity {
+
     private static final String TAG = "RecordActivity";
     private static String tempFilename = Environment.getExternalStorageDirectory().getAbsolutePath() + "/temp.mp4";
     private String mFilePath = "";
@@ -30,13 +30,22 @@ public class RecordActivity extends Activity {
     private MediaRecorder mRecorder = null;
 
     private Button   mPlayButton = null;
-    private MediaPlayer   mPlayer = null;
+    private MediaPlayer mPlayer = null;
 
     boolean mStartRecording = true;
     boolean mStartPlaying = true;
 
     private long projectID;
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_record2);
+
+        projectID = getIntent().getLongExtra(TracksActivity.INTENT_PROJECT_ID, 0);
+        setTitle("Ready to Record...");
+        setupButtons();
+    }
 
     private void onRecord(boolean start) {
         if (start) {
@@ -134,8 +143,16 @@ public class RecordActivity extends Activity {
                 onRecord(mStartRecording);
                 if (mStartRecording) {
                     mRecordButton.setText("Stop recording");
+                    mRecordButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                    setTitle("Recording");
                 } else {
-                    mRecordButton.setText("Start recording");
+                    mRecordButton.setText("Done recording");
+                    mRecordButton.setBackgroundColor(getResources().getColor(R.color.colorSecondaryText));
+                    mRecordButton.setEnabled(false);
+                    mPlayButton.setBackgroundColor(getResources().getColor(R.color.white));
+                    mPlayButton.setTextColor(getResources().getColor(R.color.half_black));
+                    mPlayButton.setEnabled(true);
+                    setTitle("Done Recording!");
                 }
                 mStartRecording = !mStartRecording;
             }
@@ -146,23 +163,16 @@ public class RecordActivity extends Activity {
                 onPlay(mStartPlaying);
                 if (mStartPlaying) {
                     mPlayButton.setText("Stop playing");
+                    mPlayButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
                 } else {
                     mPlayButton.setText("Start playing");
+                    mPlayButton.setBackgroundColor(getResources().getColor(R.color.white));
                 }
                 mStartPlaying = !mStartPlaying;
             }
         });
     }
 
-    @Override
-    public void onCreate(Bundle icicle) {
-        super.onCreate(icicle);
-        setContentView(R.layout.activity_record);
-
-        projectID = getIntent().getLongExtra(TracksActivity.INTENT_PROJECT_ID, 0);
-
-        setupButtons();
-    }
 
     @Override
     public void onPause() {
@@ -178,54 +188,3 @@ public class RecordActivity extends Activity {
         }
     }
 }
-
-//    public RecordActivity() {
-//        mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
-//        mFileName += "/audiorecordtest.mp4";
-//        Log.d("RecordActivity", "Filepath: "+mFileName);
-//    }
-
-//    class RecordButton extends Button {
-//        boolean mStartRecording = true;
-//
-//        OnClickListener clicker = new OnClickListener() {
-//            public void onClick(View v) {
-//                onRecord(mStartRecording);
-//                if (mStartRecording) {
-//                    setText("Stop recording");
-//                } else {
-//                    setText("Start recording");
-//                }
-//                mStartRecording = !mStartRecording;
-//            }
-//        };
-//
-//        public RecordButton(Context ctx) {
-//            super(ctx);
-//            setText("Start recording");
-//            setOnClickListener(clicker);
-//        }
-//    }
-//
-//    class PlayButton extends Button {
-//        boolean mStartPlaying = true;
-//
-//        OnClickListener clicker = new OnClickListener() {
-//            public void onClick(View v) {
-//                onPlay(mStartPlaying);
-//                if (mStartPlaying) {
-//                    setText("Stop playing");
-//                } else {
-//                    setText("Start playing");
-//                }
-//                mStartPlaying = !mStartPlaying;
-//            }
-//        };
-//
-//        public PlayButton(Context ctx) {
-//            super(ctx);
-//            setText("Start playing");
-//            setOnClickListener(clicker);
-//        }
-//    }
-

@@ -6,6 +6,10 @@
               android:weightSum="1"
               android:padding="5dp">
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <LinearLayout
         android:id="@+id/track_item_layout"
         android:layout_width="match_parent"
@@ -34,5 +38,18 @@
 
     </LinearLayout>
 
-
+    <TextView
+        android:id="@+id/project_delete"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="DELETE TRACK"
+        android:textColor="@color/colorTextIcon"
+        android:background="@color/deletion_activated"
+        android:visibility="invisible"
+        android:enabled="false"
+        android:textSize="30dp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:gravity="center_vertical"/>
+    </FrameLayout>
 </LinearLayout>
