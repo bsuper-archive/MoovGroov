@@ -13,6 +13,10 @@ import java.util.List;
 @Table(name = "Tracks")
 public class Track extends Model {
 
+    public static final int TYPE_BEAT_LOOP = 0;
+    public static final int TYPE_VOCAL = 1;
+
+
     public static final String TAG = "TRACKS_DB_MODEL";
 
     @Column(name = "name")
@@ -24,13 +28,19 @@ public class Track extends Model {
     @Column(name = "project")
     public Project project;
 
+    // new attribute that records the type: "beats" or "sound"
+    @Column(name = "type")
+    public int type;
+
     public Track() {
         super();
     }
 
-    public Track(String name, String filename, Project project) {
+    // modified! add "type" to signature
+    public Track(String name, String filename, int type, Project project) {
         this.name = name;
         this.filename = filename;
+        this.type = type;
         this.project = project;
     }
 
@@ -53,5 +63,10 @@ public class Track extends Model {
                 .where("project = ?", projectID)
                 .orderBy("name ASC")
                 .execute();
+    }
+
+    public List<Timestamp> getTimestamps() {
+        List<Timestamp> timestamps = getMany(Timestamp.class, "track");
+        return timestamps;
     }
 }
