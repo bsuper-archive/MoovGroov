@@ -119,7 +119,7 @@ public class RecordActivity extends Activity {
                         File file2 = new File(mFilePath);
                         boolean success = file.renameTo(file2);
 
-                        Track t = new Track("Vocal Recording", mFilePath, Track.TYPE_VOCAL, Project.getProject(projectID));
+                        Track t = new Track(fileName, mFilePath, Track.TYPE_VOCAL, Project.getProject(projectID));
                         t.save();
                     }
                 }).show();

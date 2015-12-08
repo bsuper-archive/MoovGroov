@@ -67,6 +67,8 @@ public class ProjectsActivity extends AppCompatActivity {
             }
         });
 
+        deleteEverything();
+
         populateDBifNecessary();
         setupRecyclerView();
         populateRecyclerView();
@@ -100,9 +102,9 @@ public class ProjectsActivity extends AppCompatActivity {
     private void populateDBifNecessary() {
         List<Project> projects = Project.getAllProjects();
         if (projects.size() == 0) {
-            Project p1 = new Project("Awesome");
-            Project p2 = new Project("Foshizzle");
-            Project p3 = new Project("Coolio");
+            Project p1 = new Project("Angela's Jam");
+            Project p2 = new Project("Nisha's Tunez");
+            Project p3 = new Project("Brian's Beatzz");
             p1.save();
             p2.save();
             p3.save();

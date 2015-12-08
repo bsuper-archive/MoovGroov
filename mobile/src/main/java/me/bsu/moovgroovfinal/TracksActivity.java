@@ -65,7 +65,7 @@ public class TracksActivity extends AppCompatActivity {
         setupFAB();
         setupRecyclerView();
         populateTracksIfNecessary();
-        
+
         initializeMediaThreads();
         connectGoogleApiClient();
     }
@@ -92,9 +92,12 @@ public class TracksActivity extends AppCompatActivity {
 
     private void initializeMediaThreads(){
 
+
         //initialize the list of media play
         mediaThreadList = new ArrayList<Thread>();
         trackEnableList = new ArrayList<Boolean>();
+        mediaThreadList.clear();
+        trackEnableList.clear();
 
         trackList = Track.getTracks(projectID);
 
@@ -150,7 +153,7 @@ public class TracksActivity extends AppCompatActivity {
     }
 
     // Send message through api to Watch
-    private void sendMessage( final String path, final String text ) {
+    private void sendMessage(final String path, final String text ) {
         Log.d("MOBILE SEND MESSAGE", "Start Beat 1");
         new Thread( new Runnable() {
             @Override

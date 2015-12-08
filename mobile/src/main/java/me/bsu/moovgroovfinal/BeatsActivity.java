@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.bsu.moovgroovfinal.models.Project;
+import me.bsu.moovgroovfinal.models.Timestamp;
 import me.bsu.moovgroovfinal.models.Track;
 import me.bsu.moovgroovfinal.services.MobileListenerService;
 
@@ -42,15 +43,15 @@ public class BeatsActivity extends AppCompatActivity {
                 if (intent.hasExtra("BEAT") && intent.hasExtra("FINISH")) {
                     String beatTimeStr = intent.getStringExtra("BEAT");
                     String finish = intent.getStringExtra("FINISH");
-                    long beatTime = Long.valueOf(beatTimeStr).longValue();
-                    Log.d("BEAT", "Broadcast receive " + beatTime + " finish: " + finish);
+                    Log.d("BEAT", "Broadcast receive " + beatTimeStr + " finish: " + finish);
                     if (finish.equals("1")) {
                         // Save File
                         saveBeat();
 
                     } else {
                         // Save beat into array
-                        beatArray.add(beatTimeStr);
+                        long beatTime = Long.valueOf(beatTimeStr).longValue();
+                        beatArray.add(beatTime);
                     }
                 }
             }
@@ -75,8 +76,12 @@ public class BeatsActivity extends AppCompatActivity {
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         String fileName = dialog.getInputEditText().getText().toString();
                         Log.d("RECORD", "EDITEXT: %s".format(dialog.getInputEditText().getText().toString()));
-                        //Track t1 = new Track(fileName, fileName, Track.TYPE_BEAT_LOOP, Project.getProject(projectID));
-
+                        Track t1 = new Track(fileName, fileName, Track.TYPE_BEAT_LOOP, Project.getProject(projectID));
+                        t1.save();
+                        for (int i = 0; i < beatArray.size(); i++) {
+                            Timestamp ts1 = new Timestamp(t1, (long) beatArray.get(i));
+                            ts1.save();
+                        }
 
                         // END ACTIVITY AND GO TO PARENT
                         finish();
