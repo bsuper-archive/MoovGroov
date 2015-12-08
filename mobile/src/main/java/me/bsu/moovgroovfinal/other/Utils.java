@@ -36,7 +36,7 @@ public class Utils {
             prev = list.get(i);
         }
 
-        Sound sound = soundArray[1];
+        Sound sound = soundArray[0];
         mSoundPlayer.playSound(sound);
 
         for (int j = 0; j<deltas.size(); j++){

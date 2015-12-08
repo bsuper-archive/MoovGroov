@@ -2,6 +2,7 @@ package me.bsu.moovgroovfinal;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -50,6 +51,9 @@ public class TracksActivity extends AppCompatActivity {
 
         projectID = getIntent().getLongExtra(INTENT_PROJECT_ID, 0);
         Log.d(TAG, String.format("Got project ID %d", projectID));
+
+        Project p = new Select().from(Project.class).where("Id = ?", projectID).executeSingle();
+        setTitle(p.name);
 
         setupFAB();
         setupRecyclerView();
@@ -150,6 +154,10 @@ public class TracksActivity extends AppCompatActivity {
             Project p = new Select().from(Project.class).where("Id = ?", projectID).executeSingle();
             Log.d(TAG, "Got Project Name: " + p.name);
 
+            String newFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
+            Log.d(TAG, "dir: " + newFileName);
+            newFileName += "/testaudio.mp3";
+
             String name = p.name + " Track 1";
             String filename = "bogus file name";
             Track t = new Track(name, filename, Track.TYPE_VOCAL, p);
@@ -157,7 +165,7 @@ public class TracksActivity extends AppCompatActivity {
 
             String name2 = p.name + " Track 2";
             String filename2 = "haha";
-            Track t2 = new Track(name2, filename2, Track.TYPE_VOCAL, p);
+            Track t2 = new Track(name2, newFileName, Track.TYPE_VOCAL, p);
             t2.save();
 
             String namebeat1 = p.name + " Beat Track 1";
@@ -173,6 +181,19 @@ public class TracksActivity extends AppCompatActivity {
             tm3.save();
             tm4.save();
             Log.d(TAG, "Track has " + tb1.getTimestamps().size() + " timestamps");
+
+            String namebeat2 = p.name + " Beat Track 2";
+            String filename4 = "empty 2";
+            Track tb2 = new Track(namebeat2, filename4, Track.TYPE_BEAT_LOOP, p);
+            tb2.save();
+            Timestamp tm5 = new Timestamp(tb2, 500);
+            Timestamp tm6 = new Timestamp(tb2, 1500);
+            Timestamp tm7 = new Timestamp(tb2, 2500);
+            Timestamp tm8 = new Timestamp(tb2, 3000);
+            tm5.save();
+            tm6.save();
+            tm7.save();
+            tm8.save();
 
 
         } else {
