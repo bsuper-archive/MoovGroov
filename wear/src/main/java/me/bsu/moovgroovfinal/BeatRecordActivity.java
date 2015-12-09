@@ -101,7 +101,7 @@ public class BeatRecordActivity extends Activity {
                     if (state == stateEnum.REC_BEAT) {
                         sendMessage(FINISH_WATCH_BEATS_ACTIVITY, "");
                         state = stateEnum.START_SEQ;
-                        newButton.setImageResource(R.drawable.seqready);
+                        newButton.setImageResource(R.drawable.seqfin);
                     }
                     return true;
                 }
