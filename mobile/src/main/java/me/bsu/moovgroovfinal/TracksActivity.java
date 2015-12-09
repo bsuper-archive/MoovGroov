@@ -368,7 +368,7 @@ public class TracksActivity extends AppCompatActivity {
                                 // do nothing
                             }
                         })
-                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setIcon(R.drawable.icon_delete)
                         .show();
 
             }
