@@ -44,7 +44,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:fab_colorNormal="@color/pink"
-            app:fab_title="Create a Vocal Melody"
+            app:fab_title="Record a Melody"
             app:fab_colorPressed="@color/pink_pressed"
             android:src="@drawable/ic_mic_white_48dp"/>
 
@@ -62,7 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:fab_colorNormal="@color/pink"
-            app:fab_title="Import Audio File"
+            app:fab_title="Import an Audio File"
             app:fab_colorPressed="@color/pink_pressed"
             android:src="@drawable/audio_file_white"
             android:scaleType="center"/>

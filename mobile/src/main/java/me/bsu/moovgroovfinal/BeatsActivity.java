@@ -29,6 +29,9 @@ import me.bsu.moovgroovfinal.sound.SoundPlayer;
 import me.bsu.moovgroovfinal.sound.SoundStore;
 
 public class BeatsActivity extends AppCompatActivity {
+
+    private static final String TAG = "BeatsActivity";
+
     BroadcastReceiver wearTapReceiver;
     List beatArray = new ArrayList();
     long projectID;
@@ -66,6 +69,7 @@ public class BeatsActivity extends AppCompatActivity {
                     } else {
                         // Save beat into array
                         long beatTime = Long.valueOf(beatTimeStr).longValue();
+                        Log.d(TAG, "beat received: "+beatTime);
                         beatArray.add(beatTime);
                         mSoundPlayer.playSound(soundArray[1]);
                         seqLayout.setBackgroundColor(getResources().getColor(R.color.colorAccent));
@@ -120,6 +124,7 @@ public class BeatsActivity extends AppCompatActivity {
                         for (int i = 0; i < beatArray.size(); i++) {
                             Timestamp ts1 = new Timestamp(t1, (long) beatArray.get(i));
                             ts1.save();
+                            Log.d(TAG, "Saved beat time: "+ts1.time);
                         }
 
                         // END ACTIVITY AND GO TO PARENT
