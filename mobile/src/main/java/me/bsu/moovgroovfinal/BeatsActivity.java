@@ -73,7 +73,7 @@ public class BeatsActivity extends AppCompatActivity {
                         beatArray.add(beatTime);
                         mSoundPlayer.playSound(soundArray[1]);
                         seqLayout.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                        seqText.setBackgroundColor(getResources().getColor(R.color.background));
+                        seqText.setTextColor(getResources().getColor(R.color.background));
                         mTimer.start();
                     }
                 }
@@ -98,7 +98,7 @@ public class BeatsActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
                 seqLayout.setBackgroundColor(getResources().getColor(R.color.background));
-                seqText.setBackgroundColor(getResources().getColor(R.color.white));
+                seqText.setTextColor(getResources().getColor(R.color.white));
             }
         };
     }

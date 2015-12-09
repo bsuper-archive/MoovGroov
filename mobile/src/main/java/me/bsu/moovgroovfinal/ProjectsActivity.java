@@ -1,5 +1,7 @@
 package me.bsu.moovgroovfinal;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -106,22 +108,25 @@ public class ProjectsActivity extends AppCompatActivity {
                 Log.d(TAG, String.format("%d long press", position));
                 Project p = Project.getAllProjects().get(position);
                 final long pid = p.getId();
-                final TextView txtDelete = (TextView) view.findViewById(R.id.project_delete);
-                if (txtDelete.isEnabled()) {
-                    txtDelete.setEnabled(false);
-                    txtDelete.setVisibility(View.INVISIBLE);
-                    Log.d(TAG,"proj deletion deactivated");
-                } else {
-                    txtDelete.setEnabled(true);
-                    txtDelete.setVisibility(View.VISIBLE);
-                    Log.d(TAG, "proj deletion activated");
-                    txtDelete.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            deleteProject(pid);
-                        }
-                    });
-                }
+
+                new AlertDialog.Builder(ProjectsActivity.this)
+                        .setTitle("Delete Project")
+                        .setMessage("Are you sure you want to delete this project?")
+                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // continue with delete
+                                Log.d("DELETE PROJECT", "delete button pressed");
+                                deleteProject(pid);
+                                populateRecyclerView();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .setIcon(R.drawable.icon_delete)
+                        .show();
             }
         }));
     }
