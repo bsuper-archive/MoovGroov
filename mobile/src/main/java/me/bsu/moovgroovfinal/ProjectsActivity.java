@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.activeandroid.query.Delete;
@@ -34,12 +35,16 @@ public class ProjectsActivity extends AppCompatActivity {
     public RecyclerView mRecyclerView;
     public ProjectsListCursorAdapter mProjectsAdapter;
 
+    public LinearLayout mNothingToShow;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_projects);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mNothingToShow = (LinearLayout) findViewById(R.id.proj_nothing_to_show);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -124,6 +129,13 @@ public class ProjectsActivity extends AppCompatActivity {
     private void populateRecyclerView() {
         mProjectsAdapter = new ProjectsListCursorAdapter(Project.fetchCursor(), this);
         mRecyclerView.swapAdapter(mProjectsAdapter, true);
+        if (Project.getAllProjects().size() <= 0) {
+            mNothingToShow.setVisibility(View.VISIBLE);
+            mRecyclerView.setVisibility(View.INVISIBLE);
+        } else {
+            mNothingToShow.setVisibility(View.INVISIBLE);
+            mRecyclerView.setVisibility(View.VISIBLE);
+        }
     }
 
     private void populateDBifNecessary() {
