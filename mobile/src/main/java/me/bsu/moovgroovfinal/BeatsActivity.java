@@ -64,7 +64,6 @@ public class BeatsActivity extends AppCompatActivity {
                         saveBeat();
 
                     } else {
-
                         // Save beat into array
                         long beatTime = Long.valueOf(beatTimeStr).longValue();
                         beatArray.add(beatTime);
@@ -76,8 +75,7 @@ public class BeatsActivity extends AppCompatActivity {
                 }
             }
         };
-        LocalBroadcastManager.getInstance(this).registerReceiver((wearTapReceiver),
-                new IntentFilter(MobileListenerService.BEATS_ACTIVITY));
+
     }
 
     private void setupSoundPlayer() {
