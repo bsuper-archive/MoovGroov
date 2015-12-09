@@ -1,8 +1,15 @@
 package me.bsu.moovgroovfinal;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -51,6 +58,10 @@ public class TracksActivity extends AppCompatActivity {
     public List<Boolean> trackEnableList;
 
     private GoogleApiClient mGoogleApiClient;
+
+    //file request/reception code from google android website:
+    //http://developer.android.com/guide/topics/providers/document-provider.html
+    private static final int READ_REQUEST_CODE = 42;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +142,7 @@ public class TracksActivity extends AppCompatActivity {
         final FloatingActionsMenu FABaddTrack = (FloatingActionsMenu) findViewById(R.id.fab_add_track);
         FloatingActionButton FABaddVocalMelody = (FloatingActionButton) findViewById(R.id.fab_add_vocal_melody_track);
         FloatingActionButton FABaddBeatLoop = (FloatingActionButton) findViewById(R.id.fab_add_beat_loop_track);
+        FloatingActionButton FABaddFile = (FloatingActionButton) findViewById(R.id.fab_add_from_file_track);
         FABaddVocalMelody.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -157,6 +169,32 @@ public class TracksActivity extends AppCompatActivity {
                 Log.d("MOBILE BEAT", "Start Beat");
             }
         });
+        FABaddFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                /**
+                 * Fires an intent to spin up the "file chooser" UI and select an image.
+                 */
+
+                // ACTION_OPEN_DOCUMENT is the intent to choose a file via the system's file
+                // browser.
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+
+                // Filter to only show results that can be "opened", such as a
+                // file (as opposed to a list of contacts or timezones)
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+                // Filter to show only images, using the image MIME data type.
+                // If one wanted to search for ogg vorbis files, the type would be "audio/ogg".
+                // To search for all documents available via installed storage providers,
+                // it would be "*/*".
+                intent.setType("audio/*");
+
+                startActivityForResult(intent, READ_REQUEST_CODE);
+
+            }
+        });
         FABaddTrack.setOnFloatingActionsMenuUpdateListener(new FloatingActionsMenu.OnFloatingActionsMenuUpdateListener() {
             @Override
             public void onMenuExpanded() {
@@ -168,6 +206,83 @@ public class TracksActivity extends AppCompatActivity {
                 mMenuBackground.setVisibility(View.INVISIBLE);
             }
         });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode,
+                                 Intent resultData) {
+
+        // The ACTION_OPEN_DOCUMENT intent was sent with the request code
+        // READ_REQUEST_CODE. If the request code seen here doesn't match, it's the
+        // response to some other intent, and the code below shouldn't run at all.
+
+        if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            // The document selected by the user won't be returned in the intent.
+            // Instead, a URI to that document will be contained in the return intent
+            // provided to this method as a parameter.
+            // Pull that URI using resultData.getData().
+            Uri uri = null;
+            if (resultData != null) {
+                uri = resultData.getData();
+                Log.i(TAG, "Result Uri: " + uri.toString());
+                String path = getPathFromURI(uri);
+                Track t = new Track(getDisplayName(path), path, Track.TYPE_VOCAL, Project.getProject(projectID));
+                t.save();
+            }
+        }
+    }
+
+    // uri converting code:
+    //http://stackoverflow.com/questions/19985286/convert-content-uri-to-actual-path-in-android-4-4
+    public String getPathFromURI(Uri uri) {
+
+        String path;
+
+        final String docId = DocumentsContract.getDocumentId(uri);
+        final String[] split = docId.split(":");
+        Uri contentUri = null;
+        contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        final String selection = "_id=?";
+        final String[] selectionArgs = new String[] {
+                split[1]
+        };
+        path = getDataColumn(getApplicationContext(), contentUri, selection, selectionArgs);
+        Log.d(TAG, "resolved path: " + path);
+        return path;
+    };
+
+    public static String getDataColumn(Context context, Uri uri, String selection,
+                                       String[] selectionArgs) {
+
+        Cursor cursor = null;
+        final String column = "_data";
+        final String[] projection = {
+                column
+        };
+
+        try {
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+                    null);
+            if (cursor != null && cursor.moveToFirst()) {
+                final int column_index = cursor.getColumnIndexOrThrow(column);
+                return cursor.getString(column_index);
+            }
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+        return null;
+    }
+
+    public String getDisplayName(String path) {
+        String displayName = "";
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(path);
+        displayName += retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+        displayName += " - ";
+        displayName += retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+        Log.d(TAG, "Retrieved audio metadata: " + displayName);
+        return displayName;
     }
 
     // Send message through api to Watch
