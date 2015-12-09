@@ -12,6 +12,57 @@
 
     <LinearLayout
         android:translationZ="100dp"
+        android:orientation="vertical"
+        android:id="@+id/track_nothing_to_show"
+        android:layout_width="match_parent"
+        android:layout_height="443dp"
+        android:visibility="visible"
+        android:weightSum="1"
+        android:paddingTop="30dp"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:src="@drawable/nothing"
+            android:scaleType="fitCenter"/>
+        <TextView
+            android:paddingTop="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:textColor="@color/colorSecondaryText"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:text="AH-OH, NOTHING HERE"/>
+        <TextView
+            android:paddingTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:textColor="@color/colorSecondaryText"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:text="Tap + to fill it up!" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/listview_tracks"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="5dp"/>
+
+    <LinearLayout
+        android:translationZ="100dp"
         android:orientation="horizontal"
         android:id="@+id/track_fab_background"
         android:layout_width="match_parent"
@@ -19,10 +70,5 @@
         android:background="@color/black_semi_transparent"
         android:visibility="invisible"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/listview_tracks"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="5dp"/>
 
 </FrameLayout>

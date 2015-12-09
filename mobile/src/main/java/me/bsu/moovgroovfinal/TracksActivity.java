@@ -52,6 +52,7 @@ public class TracksActivity extends AppCompatActivity {
     public RecyclerView mRecyclerView;
     public TracksListCursorAdapter mAdapter;
     public LinearLayout mMenuBackground;
+    public LinearLayout mNothingToShow;
 
     public List<Track> trackList;
     public List<Thread> mediaThreadList;
@@ -71,6 +72,8 @@ public class TracksActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        mNothingToShow = (LinearLayout) findViewById(R.id.track_nothing_to_show);
+
         projectID = getIntent().getLongExtra(INTENT_PROJECT_ID, 0);
         Log.d(TAG, String.format("Got project ID %sd", projectID));
 
@@ -80,7 +83,6 @@ public class TracksActivity extends AppCompatActivity {
         setupFAB();
         setupRecyclerView();
         //populateTracksIfNecessary();
-
         initializeMediaThreads();
         connectGoogleApiClient();
     }
@@ -384,6 +386,11 @@ public class TracksActivity extends AppCompatActivity {
     private void populateRecyclerView() {
         mAdapter = new TracksListCursorAdapter(Track.getTracksCursor(projectID), this);
         mRecyclerView.swapAdapter(mAdapter, true);
+        if (Track.getTracks(projectID).size() <= 0) {
+            mNothingToShow.setVisibility(View.VISIBLE);
+        } else {
+            mNothingToShow.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void populateTracksIfNecessary() {
