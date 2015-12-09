@@ -72,7 +72,6 @@ public class BeatRecordActivity extends Activity {
                     switch (state) {
                         case START_SEQ: // Countdown 3-2-1-Go
                             Log.d("WATCH BEAT", "STARTSEQ");
-                            startTime = System.currentTimeMillis();
                             startCountdown();
                             nextState = stateEnum.REC_BEAT;
                             break;
@@ -134,6 +133,7 @@ public class BeatRecordActivity extends Activity {
             }
 
             public void onFinish() {
+                startTime = System.currentTimeMillis();
                 startBeatRecording();
                 this.cancel();
             }
