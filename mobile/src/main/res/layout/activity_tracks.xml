@@ -57,6 +57,17 @@
             app:fab_colorPressed="@color/pink_pressed"
             android:src="@drawable/ic_music_note_white_48dp"/>
 
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_add_from_file_track"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_colorNormal="@color/pink"
+            app:fab_title="Import Audio File"
+            app:fab_colorPressed="@color/pink_pressed"
+            android:src="@drawable/audio_file_white"
+            android:scaleType="center"/>
+
+
 
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
