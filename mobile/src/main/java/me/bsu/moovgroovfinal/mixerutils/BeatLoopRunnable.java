@@ -2,6 +2,7 @@ package me.bsu.moovgroovfinal.mixerutils;
 
 import android.content.Context;
 import android.os.CountDownTimer;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -25,6 +26,8 @@ public class BeatLoopRunnable implements Runnable{
     SoundPlayer mSoundPlayer;
     Sound[] soundArray;
 
+    private static final String TAG = "BeatLoopRunnable";
+
     public BeatLoopRunnable(Context c, ArrayList<Integer> lp){
 
         mContext = c;
@@ -42,10 +45,13 @@ public class BeatLoopRunnable implements Runnable{
     }
 
     private void createTimer() {
+        Log.d(TAG, "Received timestamps: " + mLoop.toString());
+
         mTimer = new CountDownTimer(totalTime, 1) {
             @Override
             public void onTick(long millisUntilFinished) {
                 if (currTime == mLoop.get(currBeat)) {
+                    Log.d(TAG, "Beat index: " + currBeat + ", timestamp: " + mLoop.get(currBeat));
                     mSoundPlayer.playSound(soundArray[1]);
                     currBeat++;
                 }

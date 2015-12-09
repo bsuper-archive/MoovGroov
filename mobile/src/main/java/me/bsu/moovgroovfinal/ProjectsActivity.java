@@ -57,7 +57,7 @@ public class ProjectsActivity extends AppCompatActivity {
                 new MaterialDialog.Builder(ProjectsActivity.this)
                         .title("Create New Project")
                         .inputType(InputType.TYPE_CLASS_TEXT)
-                        .input("Project Name", "My Project", new MaterialDialog.InputCallback() {
+                        .input("Project Name", "", new MaterialDialog.InputCallback() {
                             @Override
                             public void onInput(MaterialDialog dialog, CharSequence input) {
                                 // Do something
