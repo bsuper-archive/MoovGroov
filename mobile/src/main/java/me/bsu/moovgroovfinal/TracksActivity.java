@@ -1,7 +1,9 @@
 package me.bsu.moovgroovfinal;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
@@ -349,22 +351,25 @@ public class TracksActivity extends AppCompatActivity {
                 Log.d(TAG, String.format("%d long press", position));
 
                 final Track t = Track.getTracks(projectID).get(position);
-                final TextView txtDelete = (TextView) view.findViewById(R.id.project_delete);
-                if (txtDelete.isEnabled()) {
-                    txtDelete.setEnabled(false);
-                    txtDelete.setVisibility(View.INVISIBLE);
-                    Log.d(TAG, "track deletion deactivated");
-                } else {
-                    txtDelete.setEnabled(true);
-                    txtDelete.setVisibility(View.VISIBLE);
-                    Log.d(TAG, "track deletion activated");
-                    txtDelete.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            deleteTrack(t);
-                        }
-                    });
-                }
+
+                new AlertDialog.Builder(TracksActivity.this)
+                        .setTitle("Delete Track")
+                        .setMessage("Are you sure you want to delete this track?")
+                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // continue with delete
+                                Log.d("DELETE Track", "delete button pressed");
+                                deleteTrack(t);
+                                populateRecyclerView();
+                            }
+                        })
+                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
 
             }
         }));
