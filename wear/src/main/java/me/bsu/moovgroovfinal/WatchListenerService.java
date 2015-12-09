@@ -25,7 +25,7 @@ public class WatchListenerService extends WearableListenerService {
         Log.d("WATCH BEAT", "Received START for beat");
 
         if (messageEvent.getPath().equalsIgnoreCase(START_WATCH_BEATS_ACTIVITY)){
-            Toast.makeText(this,"START BEATS",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this,"START BEATS",Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(this , BeatRecordActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
